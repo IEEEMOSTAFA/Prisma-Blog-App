@@ -80,7 +80,7 @@
 //   sendVerificationEmail: async ({ user, url, token }, request) => {
 //     console.log("Sending verification email to:", user.email);
 //     console.log("Verification URL:", url);
-    
+
 //     const info = await transporter.sendMail({
 //       from: '"Prisma Blog App" <process.env.APP_USER>',
 //       to: user.email,  // Use actual user email
@@ -175,12 +175,14 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
+    // sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       try {
         const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
         const info = await transporter.sendMail({
-          from: '"Prisma Blog" <prismablog@ph.com>',
+          from: `"Prisma Blog" <${process.env.APP_USER}>`,
+
           to: user.email,
           subject: "Please verify your email!",
           html: `<!DOCTYPE html>
@@ -290,9 +292,9 @@ export const auth = betterAuth({
         If the button doesn't work, copy and paste the link below into your browser:
       </p>
 
-      <p class="link">
-        ${url}
-      </p>
+     <a href="${url}" class="verify-button">Verify Email</a>
+    <p class="link">${url}</p>
+
 
       <p>
         This verification link will expire soon for security reasons.

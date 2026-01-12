@@ -1,133 +1,3 @@
-// import { betterAuth } from "better-auth";
-// import { PrismaClient } from "../../generated/prisma/client";
-// import { prismaAdapter } from "better-auth/adapters/prisma";
-// import { prisma } from "./prisma";
-// import app from "../app";
-// import { toNodeHandler } from "better-auth/node";
-// import nodemailer from "nodemailer"
-// // // If your Prisma file is located elsewhere, you can change the path
-// // import { PrismaClient } from "@/generated/prisma/client";
-// // const nodemailer = require("nodemailer");
-
-// // Create a transporter using Ethereal test credentials.
-// // For production, replace with your actual SMTP server details.
-// const transporter = nodemailer.createTransport({
-//     host: "smtp.gmail.com",
-//     port: 587,
-//     secure: false, // Use true for port 465, false for port 587
-//     auth: {
-//         user: process.env.APP_USER,
-//         pass: process.env.APP_PASS,
-//     },
-// });
-// // const prisma = new PrismaClient();
-// export const auth = betterAuth({
-//     database: prismaAdapter(prisma, {
-//         provider: "postgresql", // or "mysql", "postgresql", ...etc
-//     }),
-//     trustedOrigins: [process.env.APP_URL!],
-//     user: {
-//         additionalFields: {
-//             role: {
-//                 type: "string",
-//                 defaultValue: "user",
-//                 required: false,
-//             },
-//             status: {
-//                 type: "boolean",  // Must be "boolean" not "string"
-//                 defaultValue: true,  // Must be true not "true"
-//                 required: false,
-//             },
-
-//             phone: {
-//                 type: "string",
-//                 required: false,
-//             },
-//             isActive: {
-//                 type: "boolean",
-//                 defaultValue: true,
-//                 required: false,
-//             },
-//         },
-//     },
-//     emailAndPassword: {
-//         enabled: true,
-//         minPasswordLength: 6,
-//         autoSignIn: false,
-//         requireEmailVerification: true
-//     },
-//     advanced: {
-//         disableCSRFCheck: true, // Only for development/testing
-//     },
-//     onError: (error, ctx) => {
-//         console.error("BETTER AUTH ERROR:", error);
-//         console.error("ERROR CONTEXT:", ctx);
-//     },
-//     // emailVerification: {
-//     //     sendVerificationEmail: async ({ user, url, token }, request) => {
-//     //         const info = await transporter.sendMail({
-//     //             from: '"Prisma Blog App" <prisma@gmail.com>',
-//     //             to: "skmostafa8888@gmail.com",
-//     //             subject: "Hello ✔",
-//     //             text: "Hello world?", // Plain-text version of the message
-//     //             html: "<b>Hello world?</b>", // HTML version of the message
-//     //         });
-
-//     //         console.log("Message sent:", info.messageId);
-//     //     }
-//     // }
-//     emailVerification: {
-//   sendVerificationEmail: async ({ user, url, token }, request) => {
-//     console.log("Sending verification email to:", user.email);
-//     console.log("Verification URL:", url);
-
-//     const info = await transporter.sendMail({
-//       from: '"Prisma Blog App" <process.env.APP_USER>',
-//       to: user.email,  // Use actual user email
-//       subject: "Verify Your Email for Prisma Blog App",
-//       html: `
-//         <div style="font-family: Arial, sans-serif;">
-//           <h2>Welcome to Prisma Blog App!</h2>
-//           <p>Please verify your email by clicking the button below:</p>
-//           <a href="${url}" 
-//              style="background-color: #4CAF50; color: white; padding: 12px 20px; 
-//                     text-decoration: none; border-radius: 5px; display: inline-block;">
-//             Verify Email
-//           </a>
-//           <p>Or copy and paste this link in your browser:</p>
-//           <p style="word-break: break-all;">${url}</p>
-//           <p>This link will expire in 24 hours.</p>
-//         </div>
-//       `,
-//     });
-
-//     console.log("Message sent to:", user.email, "Message ID:", info.messageId);
-//   }
-// }
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 import { betterAuth } from "better-auth";
@@ -326,6 +196,16 @@ export const auth = betterAuth({
   advanced: {
     disableCSRFCheck: true, // Only for development/testing
   },
+
+  socialProviders: {
+        google: { 
+             
+            clientId: process.env.GOOGLE_CLIENT_ID as string, 
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            accessType: "offline",
+            prompt: "select_account consent",  
+        }, 
+    },
 });
 
 

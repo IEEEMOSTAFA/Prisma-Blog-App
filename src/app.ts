@@ -7,7 +7,7 @@ let app: Application = express();
 
 
 app.use(cors({
-    origin: process.env.APP_URL,
+    origin: process.env.APP_URL,     // client side URL
     credentials: true,
 }));
 app.use(express.json());

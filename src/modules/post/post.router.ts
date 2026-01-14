@@ -7,6 +7,11 @@ import auth from "../../middlewares/auth";
 const router = express.Router();
 
 
+router.get(
+    "/",
+    PostController.getAlPost
+)
+
 router.post(
     "/",
     auth("ADMIN","USER"),

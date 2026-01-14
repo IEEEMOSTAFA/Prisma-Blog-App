@@ -24,6 +24,24 @@ const createPost = async (req: Request,res: Response) => {
 
 }
 
+const getAlPost = async (req: Request, res: Response) =>{
+    try{
+        const {search} = req.query
+        console.log("Search Value : ",search);
+        const searchString = typeof search === 'string' ? search : undefined
+        const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+        const result = await postService.getAlPost({search : searchString ,tags});
+        res.status(200).json(result)
+    }
+    catch(e){
+         res.status(400).json({
+        error:"Failed to get posts",
+        details: e
+    })
+    }
+}
+
 export const PostController ={
-    createPost
+    createPost,getAlPost
 }

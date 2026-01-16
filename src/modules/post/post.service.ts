@@ -1,6 +1,7 @@
 import { email } from "better-auth/*";
-import { Post } from "../../../generated/prisma/client"
+import { Post, PostStatus } from "../../../generated/prisma/client"
 import { prisma } from "../../lib/prisma"
+import { PostWhereInput } from "../../../generated/prisma/models";
 
 const createPost = async (data: Omit<Post, 'id' | 'created' | 'updateAt' | 'authorId'>, userId: string) => {
   const result = await prisma.post.create({
@@ -12,41 +13,75 @@ const createPost = async (data: Omit<Post, 'id' | 'created' | 'updateAt' | 'auth
   return result;
 }
 
-const getAlPost = async (payload: { 
-  search?: string,
-  tags?: string[]
-}) => {
-  const allPosts = await prisma.post.findMany({
-    where: {
-      AND: [
+const getAlPost = async ( {
+  search,
+  tags = [],
+  isFeatured,
+  status,
+  authorId
 
-        payload.search && {
-          OR: [
+
+}: { 
+  search?: string | undefined,
+  tags?: string[] | [],
+  isFeatured : boolean | undefined,
+  status: PostStatus | undefined,
+  authorId: string| undefined
+}) => {
+
+  const andCondition : PostWhereInput[] = [];
+
+  if(search) {
+    andCondition.push({
+      OR: [
             {
               title: {
-                contains: payload.search as string,
+                contains: search ,
                 mode: "insensitive"
               }
             },
             {
               content: {
-                contains: payload.search as string,
+                contains: search ,
                 mode: "insensitive"
               }
             },
             {
               tags: {
-                has: payload.search as string
+                has: search
               }
             }
           ]
-        },
-        {
-          tags: {
-            hasEvery: payload.tags as string[]
-          }
-        }
-      ]
+    })
+  }
+
+  if(tags.length  > 0 ){
+    andCondition.push({
+      tags: {
+        hasEvery: tags as string[]
+      }
+    })
+  }
+  if(typeof isFeatured === 'boolean'){
+    andCondition.push({
+      isFeatured
+    })
+  }
+  if(status){
+    andCondition.push({
+      status
+    })
+  }
+  if(authorId){
+    andCondition.push({
+      authorId
+    })
+  }
+  
+
+  const allPosts = await prisma.post.findMany({
+    where: {
+       AND: andCondition
     }
   });
   return allPosts;
@@ -92,63 +127,3 @@ export const postService = {
 
 
 
-// import { email } from "better-auth/*";
-// import { Post } from "../../../generated/prisma/client"
-// import { prisma } from "../../lib/prisma"
-
-// const createPost = async (data: Omit<Post, 'id' | 'created' | 'updateAt' | 'authorId'>, userId: string) => {
-//   const result = await prisma.post.create({
-//     data: {
-//       ...data,
-//       authorId: userId
-//     }
-//   })
-//   return result;
-// }
-
-// const getAlPost = async (payload: { search: string | undefined,
-//   tags: string [] | []
-  
-
-//  }) => {
-//   const allPosts = await prisma.post.findMany({
-//     where: {
-//      AND: [
-//       {
-//         OR: [
-//         {
-//           title: {
-//             contains: payload.search as string,
-//             mode: "insensitive"
-//           },
-
-//         },
-//         {
-//           content: {
-//             contains: payload.search as string,
-//             mode: "insensitive"
-//           }
-//         },
-//         {
-//           tags: {
-//           has : payload.search as string,
-            
-
-//           }
-//         }
-//       ],
-//       tags: {
-//         hasEvery: payload.tags as string[]
-//       }  
-//       },
-//       {}
-//      ]
-//     }
-//   });
-//   return allPosts;
-// }
-
-// export const postService = {
-//   createPost,
-//   getAlPost
-// }

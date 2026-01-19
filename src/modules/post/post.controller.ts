@@ -3,6 +3,8 @@ import { PostScalarFieldEnum } from "../../../generated/prisma/internal/prismaNa
 import { postService } from "./post.service";
 import { error } from "node:console";
 import { PostStatus } from "../../../generated/prisma/enums";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
+import { string } from "better-auth/*";
 
 const createPost = async (req: Request,res: Response) => {
    try{
@@ -41,7 +43,11 @@ const getAlPost = async (req: Request, res: Response) =>{
         const status = req.query.status as PostStatus | undefined
         const authorId = req.query.authorId as string | undefined
 
-        const result = await postService.getAlPost({search : searchString ,tags,isFeatured,status,authorId});
+        const {page,limit,skip,sortBy,sortOrder} = paginationSortingHelper(req.query)
+        
+
+
+        const result = await postService.getAlPost({search : searchString ,tags,isFeatured,status,authorId,page,limit,skip,sortBy,sortOrder});
         res.status(200).json(result)
     }
     catch(e){
@@ -52,6 +58,25 @@ const getAlPost = async (req: Request, res: Response) =>{
     }
 }
 
+const getPostById = async ( req: Request, res : Response) => {
+    try{
+     const {postId} = req.params;
+     if(!postId){
+        throw new Error("Post Id is required!!")
+     }
+     const result = await postService.getPostById(postId);
+     res.status(200).json(result)
+    }
+    catch(e){
+         res.status(400).json({
+        error:"Post creation Failed",
+        details: e
+    })
+    }
+}
+
 export const PostController ={
-    createPost,getAlPost
+    createPost,
+    getAlPost,
+    getPostById
 }

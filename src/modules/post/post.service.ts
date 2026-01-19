@@ -1,7 +1,11 @@
-import { email } from "better-auth/*";
+import { date, email } from "better-auth/*";
 import { Post, PostStatus } from "../../../generated/prisma/client"
 import { prisma } from "../../lib/prisma"
 import { PostWhereInput } from "../../../generated/prisma/models";
+import { SortOrder } from "../../../generated/prisma/internal/prismaNamespace";
+
+
+
 
 const createPost = async (data: Omit<Post, 'id' | 'created' | 'updateAt' | 'authorId'>, userId: string) => {
   const result = await prisma.post.create({
@@ -13,6 +17,7 @@ const createPost = async (data: Omit<Post, 'id' | 'created' | 'updateAt' | 'auth
   return result;
 }
 
+
 const getAlPost = async ( {
   search,
   tags = [],
@@ -20,7 +25,10 @@ const getAlPost = async ( {
   status,
   authorId,
   page,
-  limit
+  limit,
+  skip,
+  sortBy,
+  sortOrder
 
 
 }: { 
@@ -30,7 +38,10 @@ const getAlPost = async ( {
   status: PostStatus | undefined,
   authorId: string| undefined,
   page: number,
-  limit: number
+  limit: number,
+  skip: number,
+  sortBy: string,
+  sortOrder: SortOrder
 }) => {
 
   const andCondition : PostWhereInput[] = [];
@@ -83,20 +94,73 @@ const getAlPost = async ( {
   }
   
 
-  const allPosts = await prisma.post.findMany({
+  const allPost = await prisma.post.findMany({
     take: limit,
-    skip
+    skip,
     
     where: {
        AND: andCondition
+    },
+    orderBy: {
+      [sortBy]:  sortOrder
     }
   });
-  return allPosts;
+
+  const total = await prisma.post.count({
+    where: {
+      AND: andCondition
+    }
+  })
+  return {
+    
+    data: allPost,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+
+    }
+  } ;
 }
+
+
+const getPostById = async(postId: string) =>{
+
+  return await prisma.$transaction( async(tx) =>{
+    await tx.post.update({
+      where: {
+        id: postId
+      },
+      data: {
+        views: {
+          increment: 1
+        }
+      }
+    })
+
+
+
+    const postData = await tx.post.findUnique({
+      where: {
+        id : postId
+      }
+    })
+    return postData
+  })
+
+}
+
+
+
+
+
+
 
 export const postService = {
   createPost,
-  getAlPost
+  getAlPost,
+  getPostById
 }
 
 

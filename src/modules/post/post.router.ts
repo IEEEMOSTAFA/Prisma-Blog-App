@@ -11,6 +11,10 @@ router.get(
     "/",
     PostController.getAlPost
 )
+router.get(
+    "/:postId",
+    PostController.getPostById
+)
 
 router.post(
     "/",

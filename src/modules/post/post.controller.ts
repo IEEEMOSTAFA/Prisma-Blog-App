@@ -1,4 +1,4 @@
-import { Request,Response } from "express";
+import { NextFunction, Request,Response } from "express";
 import { PostScalarFieldEnum } from "../../../generated/prisma/internal/prismaNamespace";
 import { postService } from "./post.service";
 import { error } from "node:console";
@@ -7,7 +7,7 @@ import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 import { string } from "better-auth/*";
 import { UserRole } from "../../middlewares/auth";
 
-const createPost = async (req: Request,res: Response) => {
+const createPost = async (req: Request,res: Response,next : NextFunction) => {
    try{
 
     const user = req.user;
@@ -20,10 +20,7 @@ const createPost = async (req: Request,res: Response) => {
     res.status(201).json(result)
    }
    catch(e){
-    res.status(400).json({
-        error:"Post Creation Failed",
-        details: e
-    })
+   next(e);
    }
 
 }

@@ -26,6 +26,19 @@ router.delete(
     CommentController.deleteComment
 )
 
+// Update Comment : 
+router.patch(
+    "/:commentId",
+    auth(UserRole.USER, UserRole.ADMIN),
+    CommentController.updateComment
+)
+// Moderate Comment : 
+router.patch(
+    "/:commentId/moderate",
+    auth(UserRole.ADMIN),
+    CommentController.moderateComment
+)
+
 
 
 
